@@ -505,4 +505,9 @@ gcloud compute instance-groups managed set-autoscaling my-instance-group \
 ### Autoscaling Script (`autoscale_monitor.py`):
 *(Refer to Section 9 for full code.)*
 
+
+## Video Demo link
+
+https://drive.google.com/drive/folders/1PWxU4sGtoSntQ5EHBS-dof0QtU20Oqpu?usp=sharing
+
 ---
