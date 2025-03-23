@@ -464,6 +464,7 @@ cd node_exporter-1.x.x.linux-amd64
 chmod +x node_exporter
 ./node_exporter &
 ```
+![Node Explorer](Noe_Explorer.png)
 
 ### Grafana Installation Commands:
 ```bash
