@@ -19,7 +19,7 @@
 10. [Testing and Demonstration](#testing-and-demonstration)
 11. [Challenges and Difficulties Encountered](#challenges)
 12. [Conclusion and Future Improvements](#conclusion)
-13. [Appendix: Commands and Configuration Files](#appendix)
+13. [Appendix: Commands, Screenshots and Configuration Files](#appendix)
 
 ---
 
@@ -451,6 +451,28 @@ scrape_configs:
       - targets: ['localhost:9100']
 ```
 
+### Alert rule in config file
+
+```yaml
+groups:
+  - name: CPU_Usage_Alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m]))) * 100 > 75
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High CPU usage detected"
+          description: "Instance {{ $labels.instance }} has CPU utilization above 75% for more than 5 minutes."
+```
+
+### Query used in Prometheus            and Grafana
+
+```
+100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m]))) * 100
+```
+
 - Output
 
 ![Prometheas](Prometheas.png)
@@ -478,6 +500,7 @@ sudo systemctl enable grafana-server
 ```
 
 ![Grrafana](Grafana.png)
+
 ### GCP CLI and MIG Commands:
 ```bash
 gcloud init
@@ -506,12 +529,14 @@ gcloud compute instance-groups managed set-autoscaling my-instance-group \
 ### Autoscaling Script (`autoscale_monitor.py`):
 *(Refer to Section 9 for full code.)*
 
-![AutoScale]('AutoScaling.png')
+![Autoscaled from 2->4 instances](AutoScaling.png)
 
 
 ## Video Demo link
 
 [Link](https://drive.google.com/drive/folders/1PWxU4sGtoSntQ5EHBS-dof0QtU20Oqpu?usp=sharing)
+
+[![Video Demo](Grafana.png)](VCC_3.mp4)
 
 ## 14. Architecture Diagram and Flow
 
