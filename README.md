@@ -484,14 +484,15 @@ gcloud init
 gcloud config set project YOUR_PROJECT_ID
 
 gcloud compute instance-templates create my-instance-template \
-    --machine-type=n1-standard-1 \
+    --machine-type=n1-standard-1\
     --image-family=debian-10 \
     --image-project=debian-cloud \
-    --boot-disk-size=10GB
+    --boot-disk-size=10GB \
+    --metadata=startup-script="#!/bin/bash; apt-get update; apt-get install -y stress; stress --cpu 4 --timeout 120 &"
 
 gcloud compute instance-groups managed create my-instance-group \
     --base-instance-name=my-instance \
-    --size=1 \
+    --size=2 \
     --template=my-instance-template \
     --zone=us-central1-a
 
@@ -509,5 +510,87 @@ gcloud compute instance-groups managed set-autoscaling my-instance-group \
 ## Video Demo link
 
 https://drive.google.com/drive/folders/1PWxU4sGtoSntQ5EHBS-dof0QtU20Oqpu?usp=sharing
+
+
+Below is the updated report with an additional section that details the architecture diagram, illustrating the complete flow—from the local VM running monitoring and stress tests, to the GCP Managed Instance Group (MIG) autoscaling with startup scripts executing stress commands on all instances.
+
+---
+
+# Comprehensive Assignment Report
+
+*(For brevity, please refer to the full report content provided earlier. This update adds Section 14 below.)*
+
+---
+
+## 14. Architecture Diagram and Flow
+
+The following diagram represents the overall architecture and data flow for the project. It illustrates how the local VM and its monitoring stack interact with the GCP environment, triggering autoscaling and stress commands on new instances.
+
+```
+                                 +---------------------------------+
+                                 |         GCP Project             |
+                                 |                                 |
+                                 |  Managed Instance Group (MIG)     |
+                                 |  (Minimum: 2, Maximum: 5)         |
+                                 |                                 |
+                                 |  +---------------------------+  | <-- New instances created
+                                 |  | Instance Template         |  |     with startup script that:
+                                 |  | - Debian 11               |  |     - Installs stress tool
+                                 |  | - Startup script:         |  |     - Executes stress command
+                                 |  |   apt-get update;         |  |
+                                 |  |   apt-get install -y stress|  |
+                                 |  |   stress --cpu 4 --timeout 120 &  |  
+                                 |  +---------------------------+  |
+                                 +---------------^-----------------+
+                                                 |
+                                                 |  Autoscaling Trigger
+                                                 |  via gcloud CLI (from local script)
+                                                 |
++-------------------------------------------------+
+|                Local Linux VM                   |
+|                                                 |
+|  +----------------+     +---------------------+ |
+|  | Prometheus     |<--->| Node Exporter       | |
+|  | (Metrics: CPU  |     | (System metrics)    | |
+|  | usage, etc.)   |     +---------------------+ |
+|  +----------------+              |                |
+|         |                      (Scrapes metrics)   |
+|         v                           |                |
+|  +----------------+                 |                |
+|  | Grafana        |<----------------+                |
+|  | (Dashboard)    |                                  |
+|  +----------------+                                  |
+|         |                                          Autoscaling Script
+|         v                                          (Python script monitors CPU usage)
+|  +----------------------------+                    (Triggers scaling and stress commands)
+|  | Autoscaling Python Script  |-------------------------->
+|  | (psutil & gcloud CLI)      |  <--- Runs stress on all instances
+|  +----------------------------+
+|                                                 |
++-------------------------------------------------+
+```
+
+### Diagram Explanation:
+- **Local Linux VM:**  
+  Hosts the monitoring stack (Prometheus and Node Exporter) and Grafana for visualization. It also runs the Python autoscaling script that monitors CPU usage using the `psutil` library.
+  
+- **Autoscaling Script:**  
+  When CPU usage exceeds 75%, the script uses the gcloud CLI to resize the Managed Instance Group (MIG) on GCP. It then remotely triggers the stress command on every instance (existing and new) using SSH.
+  
+- **GCP Managed Instance Group (MIG):**  
+  Consists of instances created based on an instance template that has a startup script. The startup script installs and executes the stress command upon instance initialization.
+  
+- **Instance Template:**  
+  Defines the configuration for new instances (e.g., OS, machine type, disk size) and includes a startup script that automatically runs the stress command.
+
+This comprehensive flow ensures that:
+1. **Local Monitoring:**  
+   The local VM monitors system performance using Prometheus and Grafana.
+2. **Autoscaling:**  
+   The autoscaling script triggers GCP autoscaling based on resource thresholds.
+3. **New Instance Setup:**  
+   Each new instance automatically runs the stress command as part of its startup process.
+4. **Unified Workload Simulation:**  
+   The stress command is executed both on the local VM (as part of the demonstration) and on every instance in the MIG, ensuring consistent workload simulation across the entire system.
 
 ---
