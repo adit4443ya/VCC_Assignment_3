@@ -1,7 +1,7 @@
 
 ---
 
-# Comprehensive Assignment Report
+# VCC Assignment_3 Report
 
 - Roll no. - B22CS055
 - Name:- Aditya Trivedi
@@ -509,18 +509,7 @@ gcloud compute instance-groups managed set-autoscaling my-instance-group \
 
 ## Video Demo link
 
-https://drive.google.com/drive/folders/1PWxU4sGtoSntQ5EHBS-dof0QtU20Oqpu?usp=sharing
-
-
-Below is the updated report with an additional section that details the architecture diagram, illustrating the complete flow—from the local VM running monitoring and stress tests, to the GCP Managed Instance Group (MIG) autoscaling with startup scripts executing stress commands on all instances.
-
----
-
-# Comprehensive Assignment Report
-
-*(For brevity, please refer to the full report content provided earlier. This update adds Section 14 below.)*
-
----
+[Link](https://drive.google.com/drive/folders/1PWxU4sGtoSntQ5EHBS-dof0QtU20Oqpu?usp=sharing)
 
 ## 14. Architecture Diagram and Flow
 
